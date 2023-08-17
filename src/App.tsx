@@ -7,7 +7,6 @@ import {
   Flex,
   HStack,
   Heading,
-  Progress,
   Stack,
   StackDivider,
   Text,
