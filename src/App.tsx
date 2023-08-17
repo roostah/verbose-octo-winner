@@ -1,13 +1,13 @@
-import { useFormik } from "formik";
 import {
   Box,
-  Button,
   Card,
   CardBody,
   CardHeader,
+  CircularProgress,
   Flex,
   HStack,
   Heading,
+  Progress,
   Stack,
   StackDivider,
   Text,
@@ -36,6 +36,10 @@ const App: React.FC = () => {
     size: 0,
     description: ''
   });
+  const [progress, setProgress] = useState({
+    max: 100,
+    value: 0
+  })
   
   useEffect(() => {
     if (window.Worker) {
@@ -44,7 +48,7 @@ const App: React.FC = () => {
   }, [fhWorker]);
 
 
-  const handleSubmitFile = (values: FormValues) => {
+  const handleSubmitFile = () => {
     if (fileRef && fileRef.current && fileRef.current.files) {
       let file = fileRef.current.files[0];
 
@@ -54,6 +58,11 @@ const App: React.FC = () => {
           fhWorker,
           (chunks, chunksProcessed) => {
             console.log('progress: ', chunksProcessed, chunks);
+            setProgress({
+              ...progress,
+              max: chunks,
+              value: chunksProcessed
+            });
           },
           (hash, timeProcessed) => {
             console.log('finished: ', hash, timeProcessed);
@@ -61,51 +70,45 @@ const App: React.FC = () => {
               ...filemeta,
               hash: hash,
               name: file.name,
-              size: file.size,
-              description: values.filedescription
+              size: file.size
             });
           });
       }
     }
   };
-  
-  const formik = useFormik({
-    initialValues: {
-      file: '',
-      filedescription: ''
-    },
-    onSubmit: handleSubmitFile,
-  });
 
   return (
     <Flex bg="gray.100" align="center" justify="center" h="100vh">
       <HStack alignItems={"stretch"}>
       <Box bg="white" p={6} rounded="md">
-        <form onSubmit={formik.handleSubmit}>
           <VStack spacing={4} align="flex-start">
             <label htmlFor='file'>Select file to hash</label>
             <input
               id='file'
               type='file'
               ref={fileRef}
-              {...formik.getFieldProps('file')}
+              onChange={handleSubmitFile}
             />
-
+            
             <Textarea
               id='filedescription'
               placeholder='Enter file description'
               maxLength={500}
-              {...formik.getFieldProps('filedescription')}
+              onChange={(e) => {
+                setFileMeta({
+                  ...filemeta,
+                  description: e.target.value
+                })
+              }}
              />
 
-            {formik.errors.file ? <div>{formik.errors.file}</div> : null}
-            <Button type='submit'>Submit</Button>
           </VStack>
-        </form>
       </Box>
-      <Card size={"lg"}>
-        <CardHeader>
-          <Heading size='md'>File Hash Report</Heading>
+      <Card size={"lg"} minW={'600px'}>
+        <CardHeader >
+          <Heading size='md'>File Hash Report
+          <CircularProgress value={progress.value} color='green.400' max={progress.max} size='30px' pl={10} />
+          </Heading>
         </CardHeader>
 
         <CardBody>
