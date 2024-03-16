@@ -15,7 +15,7 @@
     "@types/react-dom": "^18.2.7",
     "crypto-js": "^4.1.1",
     "formik": "^2.4.3",
-    "framer-motion": "^10.16.0",
+    "framer-motion": "^10.18.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
